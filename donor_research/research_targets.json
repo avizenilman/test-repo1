@@ -1,0 +1,182 @@
+{
+  "research_list": [
+    {
+      "name": "Judy Estrin",
+      "email": "jestrin@jlabsllc.com",
+      "notes": "JLabs LLC",
+      "spouse": null,
+      "location": null
+    },
+    {
+      "name": "Alka Tandan",
+      "email": "atandan@yahoo.com",
+      "notes": null,
+      "spouse": null,
+      "location": null
+    },
+    {
+      "name": "Kathleen Bomze",
+      "email": "kathleen@bomze.com",
+      "notes": null,
+      "spouse": null,
+      "location": null
+    },
+    {
+      "name": "Jeff Berman",
+      "email": "jeff@waitwhat.com",
+      "notes": "WaitWhat (media company)",
+      "spouse": null,
+      "location": null
+    },
+    {
+      "name": "Eliza Nemser",
+      "email": "enemser@gmail.com",
+      "notes": "Donor-bundler type",
+      "spouse": null,
+      "location": null
+    },
+    {
+      "name": "Lara Fox",
+      "email": "lfox@marincf.org",
+      "notes": "Marin Community Foundation",
+      "spouse": null,
+      "location": "Marin County, CA"
+    },
+    {
+      "name": "Mara Wallace",
+      "email": "marafwallace@gmail.com",
+      "notes": "Donor-bundler type",
+      "spouse": null,
+      "location": null
+    },
+    {
+      "name": "Amy Metzler Ritter",
+      "email": "amyjmetzler@gmail.com",
+      "notes": "Married to one of the most successful VCs ever",
+      "spouse": "Unknown - top VC",
+      "location": null
+    },
+    {
+      "name": "Satya Patel",
+      "email": "satya@homebrew.co",
+      "notes": "Hunter Walk's partner at Homebrew VC",
+      "spouse": null,
+      "location": "San Francisco, CA",
+      "employer": "Homebrew"
+    },
+    {
+      "name": "Susie Hwang",
+      "email": "shwang@me.com",
+      "notes": "Big tech donor organizer in Palo Alto",
+      "spouse": null,
+      "location": "Palo Alto, CA"
+    },
+    {
+      "name": "Jonathan Glick",
+      "email": "jonathan@sulia.com",
+      "notes": "Canadian lefty, founded Sulia",
+      "spouse": "Shana Fisher",
+      "spouse_notes": "One of the best VCs in NYC, runs Third Kind Ventures",
+      "location": "New York, NY"
+    },
+    {
+      "name": "Susan Sawyers",
+      "email": "susaw@mac.com",
+      "notes": null,
+      "spouse": null,
+      "location": null
+    },
+    {
+      "name": "Alison Pincus",
+      "email": "Alison@super.io",
+      "notes": "Co-founder One Kings Lane (acq. Bed Bath Beyond 2016), Social impact entrepreneur",
+      "spouse": "Mark Pincus",
+      "spouse_notes": "Founder of Zynga",
+      "location": "San Francisco, CA",
+      "employer": "Allies for Allies"
+    },
+    {
+      "name": "Chad Dyer",
+      "email": "chad@futurealli.es",
+      "notes": "Was IT person at Sequoia, very generous donor",
+      "spouse": null,
+      "location": null,
+      "employer": "Future Allies (formerly Sequoia)"
+    },
+    {
+      "name": "Sarika Singh",
+      "email": "szsingh@gmail.com",
+      "notes": null,
+      "spouse": null,
+      "location": null
+    },
+    {
+      "name": "Erika Reinhardt",
+      "email": "embreinhardt@gmail.com",
+      "notes": null,
+      "spouse": "Peter Reinhardt",
+      "spouse_notes": "Co-founder of Segment (acquired by Twilio)",
+      "location": "San Francisco, CA"
+    },
+    {
+      "name": "Sarah Rogers",
+      "email": "serogers@gmail.com",
+      "notes": "COO of a PE firm",
+      "spouse": null,
+      "location": null
+    },
+    {
+      "name": "Jeremy Liew",
+      "email": "jeremy@lsvp.com",
+      "notes": "Billionaire VC at Lightspeed",
+      "spouse": null,
+      "location": "Menlo Park, CA",
+      "employer": "Lightspeed Venture Partners"
+    },
+    {
+      "name": "Janou Gordon",
+      "email": "janou@lsvp.com",
+      "notes": "Staff at Lightspeed - maybe not quite six figures capacity",
+      "spouse": null,
+      "location": null,
+      "employer": "Lightspeed Venture Partners"
+    },
+    {
+      "name": "Aston Motes",
+      "email": "astonm@gmail.com",
+      "notes": "First employee at Dropbox",
+      "spouse": null,
+      "location": "Georgia",
+      "employer": "Dropbox (early employee)"
+    },
+    {
+      "name": "Niffer Nan",
+      "email": "jennifer.nan@gmail.com",
+      "notes": null,
+      "spouse": null,
+      "location": null
+    },
+    {
+      "name": "Alissa Brandon",
+      "email": "Alissa@thechange.ai",
+      "notes": "The Change AI",
+      "spouse": null,
+      "location": null,
+      "employer": "The Change AI"
+    },
+    {
+      "name": "Roy Bahat",
+      "email": "roybahat+mtg@gmail.com",
+      "notes": "VC at Bloomberg Beta",
+      "spouse": null,
+      "location": "San Francisco, CA",
+      "employer": "Bloomberg Beta"
+    }
+  ],
+  "excluded": ["Cameron Thompson", "Salena Zellers"],
+  "metadata": {
+    "created": "2026-01-29",
+    "source": "Registration list screenshots",
+    "notes": "Donor research targets for political contribution lookup"
+  }
+}
