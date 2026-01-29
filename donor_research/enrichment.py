@@ -302,6 +302,11 @@ def _parse_location(location: str) -> tuple[Optional[str], Optional[str]]:
 
     location = location.strip()
 
+    # Remove common country suffixes
+    location = re.sub(r",?\s*United States\s*$", "", location, flags=re.IGNORECASE)
+    location = re.sub(r",?\s*USA\s*$", "", location, flags=re.IGNORECASE)
+    location = location.strip()
+
     # State abbreviation mapping
     state_abbrevs = {
         "alabama": "AL", "alaska": "AK", "arizona": "AZ", "arkansas": "AR",

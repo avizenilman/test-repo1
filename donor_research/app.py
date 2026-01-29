@@ -108,7 +108,7 @@ if "donors" not in st.session_state:
 
 # Main content area
 st.subheader("Enter LinkedIn URLs")
-st.caption("Add rows using the '+' button below the table. Paste LinkedIn profile URLs for each donor.")
+st.caption("Add rows using the '+' button. You can also use `manual_entry.py` to create profiles from screenshot data.")
 
 # Editable dataframe
 edited_df = st.data_editor(
