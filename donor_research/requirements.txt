@@ -18,3 +18,10 @@ pandas>=2.0.0
 
 # Optional: Rich terminal output for debugging
 rich>=13.0.0
+
+# DSPy for LLM-powered extraction (optional but recommended)
+dspy-ai>=2.0.0
+
+# For DSPy backends (install one):
+# anthropic>=0.18.0  # For Claude
+# openai>=1.0.0      # For GPT

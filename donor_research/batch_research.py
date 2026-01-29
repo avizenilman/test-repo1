@@ -9,6 +9,7 @@ Usage:
     python batch_research.py                    # Process all targets
     python batch_research.py "Jeremy Liew"      # Process single person
     python batch_research.py --enrich           # Web search enrichment first
+    python batch_research.py --enrich "Name"    # Enrich + search single person
 """
 
 import json
@@ -23,6 +24,13 @@ from models import PersonProfile, LinkedInProfile, NameVariant, Employer
 from fec_search import search_fec
 from nonprofit_search import search_nonprofits
 from synthesis import generate_dossier, save_outputs, dossier_to_markdown
+
+# Web enrichment (optional)
+try:
+    from web_enrichment import enrich_person, create_enriched_profile
+    ENRICHMENT_AVAILABLE = True
+except ImportError:
+    ENRICHMENT_AVAILABLE = False
 
 
 def load_targets(filepath: str = "research_targets.json") -> list[dict]:
@@ -131,7 +139,7 @@ def _create_spouse_profile(name: str, notes: str) -> PersonProfile:
     )
 
 
-def research_person(target: dict, api_key: str, output_dir: str = "outputs") -> dict:
+def research_person(target: dict, api_key: str, output_dir: str = "outputs", use_enrichment: bool = False) -> dict:
     """Run full research pipeline on a single person."""
 
     name = target["name"]
@@ -139,8 +147,25 @@ def research_person(target: dict, api_key: str, output_dir: str = "outputs") -> 
     print(f"Researching: {name}")
     print(f"{'='*60}")
 
-    # Create profile
-    profile = create_profile_from_target(target)
+    # Optionally enrich with web search first
+    if use_enrichment and ENRICHMENT_AVAILABLE:
+        print("\n🌐 Enriching with web search...")
+        enriched_data = enrich_person(
+            name=name,
+            known_context=target.get("notes", ""),
+            known_employer=target.get("employer"),
+            known_location=target.get("location"),
+            known_spouse=target.get("spouse"),
+        )
+        # Create profile from enriched data
+        profile = create_enriched_profile(enriched_data)
+        target["enriched"] = enriched_data  # Store for output
+        print(f"  Enrichment found: employer={enriched_data.get('current_employer')}, "
+              f"location={enriched_data.get('city')}, {enriched_data.get('state')}")
+    else:
+        # Create profile from target data
+        profile = create_profile_from_target(target)
+
     print(f"Location: {profile.city}, {profile.state}")
     print(f"Employer: {profile.current_employer or 'Unknown'}")
     if profile.spouse:
@@ -199,13 +224,24 @@ def main():
 
     print(f"✅ FEC API key loaded: {api_key[:8]}...")
 
+    # Parse arguments
+    use_enrichment = "--enrich" in sys.argv
+    args = [a for a in sys.argv[1:] if a != "--enrich"]
+
+    if use_enrichment:
+        if ENRICHMENT_AVAILABLE:
+            print("🌐 Web enrichment ENABLED")
+        else:
+            print("⚠️  Web enrichment requested but module not available")
+            use_enrichment = False
+
     # Load targets
     targets = load_targets()
     print(f"📋 Loaded {len(targets)} research targets")
 
     # Check for single-person mode
-    if len(sys.argv) > 1 and sys.argv[1] != "--enrich":
-        search_name = sys.argv[1]
+    if args:
+        search_name = args[0]
         targets = [t for t in targets if search_name.lower() in t["name"].lower()]
         if not targets:
             print(f"❌ No target found matching '{search_name}'")
@@ -216,7 +252,7 @@ def main():
     results = []
     for target in targets:
         try:
-            result = research_person(target, api_key)
+            result = research_person(target, api_key, use_enrichment=use_enrichment)
             results.append(result)
         except Exception as e:
             print(f"❌ Error researching {target['name']}: {e}")
