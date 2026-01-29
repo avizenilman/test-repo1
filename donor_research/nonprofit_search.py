@@ -1,15 +1,17 @@
 """
-Nonprofit and foundation search via ProPublica Nonprofit Explorer.
+Nonprofit and foundation search via ProPublica + Open990.
 
 Searches for:
-1. Board positions (from LinkedIn profile + 990 cross-reference)
+1. Board positions (from LinkedIn profile + 990 officer search)
 2. Family foundations (lastname Family Foundation, lastname Foundation, etc.)
 3. 990 filing details (assets, giving, grantees)
 
-ProPublica API: https://projects.propublica.org/nonprofits/api
+Data sources:
+- ProPublica API: https://projects.propublica.org/nonprofits/api
+- Open990 API: https://www.open990.org/api/ (has officer name search!)
 
-Note: ProPublica doesn't have direct officer/trustee search by name.
-We search by foundation name patterns and match against profile data.
+The key insight: Open990 indexes 990 officers/trustees by name, so we can
+search "Alison Pincus" and find every nonprofit where she's listed.
 """
 
 import re
@@ -27,6 +29,7 @@ from models import (
 
 
 PROPUBLICA_BASE = "https://projects.propublica.org/nonprofits/api/v2"
+OPEN990_BASE = "https://www.open990.org/api"
 
 # Common family foundation naming patterns
 FOUNDATION_PATTERNS = [
@@ -60,11 +63,17 @@ def search_nonprofits(
     linkedin_boards = _extract_linkedin_boards(profile)
     boards.extend(linkedin_boards)
 
-    # Step 2: Search for family foundation
+    # Step 2: Search Open990 for officer/trustee positions by name
+    # This is the key reverse lookup - find all 990s where this person is listed
+    open990_boards, open990_audit = _search_open990_officers(profile)
+    boards.extend(open990_boards)
+    audit.extend(open990_audit)
+
+    # Step 3: Search for family foundation
     foundation, foundation_audit = _search_family_foundation(profile)
     audit.extend(foundation_audit)
 
-    # Step 3: Look up EINs for LinkedIn board positions
+    # Step 4: Look up EINs for LinkedIn board positions
     for board in linkedin_boards:
         if not board.ein:
             ein, ein_audit = _lookup_organization_ein(board.organization)
@@ -72,7 +81,7 @@ def search_nonprofits(
             if ein:
                 board.ein = ein
 
-    # Step 4: Search spouse if present
+    # Step 5: Search spouse if present
     if profile.spouse:
         spouse_boards, spouse_foundation, spouse_audit = search_nonprofits(
             profile.spouse
@@ -162,6 +171,108 @@ def _extract_linkedin_boards(profile: PersonProfile) -> list[BoardPosition]:
                 )
 
     return boards
+
+
+def _search_open990_officers(
+    profile: PersonProfile,
+) -> tuple[list[BoardPosition], list[AuditQuery]]:
+    """
+    Search Open990 for organizations where this person is listed as officer/trustee.
+
+    This is the reverse lookup approach - instead of searching by foundation name,
+    we search by person name and find all their 990 affiliations.
+
+    Open990 API: https://www.open990.org/api/
+    """
+    boards = []
+    audit = []
+    seen_eins: set[str] = set()
+
+    for name_variant in profile.names:
+        # Skip low confidence variants
+        if name_variant.confidence < 0.7:
+            continue
+
+        name = name_variant.value
+
+        try:
+            # Open990 officer search endpoint
+            response = requests.get(
+                f"{OPEN990_BASE}/officers/",
+                params={
+                    "name": name,
+                    "limit": 50,
+                },
+                timeout=30,
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                results = data if isinstance(data, list) else data.get("results", [])
+
+                audit.append(
+                    AuditQuery(
+                        api="open990",
+                        endpoint="/officers/",
+                        params={"name": name},
+                        timestamp=datetime.now(),
+                        results_count=len(results),
+                        success=True,
+                        error=None,
+                    )
+                )
+
+                for result in results:
+                    ein = str(result.get("ein", ""))
+                    if ein in seen_eins:
+                        continue
+                    seen_eins.add(ein)
+
+                    # Extract organization and role info
+                    org_name = result.get("organization_name", result.get("name", "Unknown"))
+                    role = result.get("title", result.get("role", "Officer/Trustee"))
+                    year = result.get("tax_year", result.get("year"))
+
+                    boards.append(
+                        BoardPosition(
+                            organization=org_name,
+                            role=role,
+                            source="990",
+                            ein=ein if ein else None,
+                            years=str(year) if year else None,
+                        )
+                    )
+
+            else:
+                audit.append(
+                    AuditQuery(
+                        api="open990",
+                        endpoint="/officers/",
+                        params={"name": name},
+                        timestamp=datetime.now(),
+                        results_count=0,
+                        success=False,
+                        error=f"HTTP {response.status_code}",
+                    )
+                )
+
+        except requests.exceptions.RequestException as e:
+            audit.append(
+                AuditQuery(
+                    api="open990",
+                    endpoint="/officers/",
+                    params={"name": name},
+                    timestamp=datetime.now(),
+                    results_count=0,
+                    success=False,
+                    error=str(e),
+                )
+            )
+
+        # Small delay between requests
+        time.sleep(0.3)
+
+    return boards, audit
 
 
 def _search_family_foundation(
