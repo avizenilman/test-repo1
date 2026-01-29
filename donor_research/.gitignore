@@ -8,8 +8,8 @@ __pycache__/
 dist/
 build/
 
-# Environment
-.env
+# Environment (keeping .env for this bespoke tool)
+# .env
 .venv/
 venv/
 ENV/
